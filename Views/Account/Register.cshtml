@@ -1,0 +1,123 @@
+@model BlindMatchPAS.Models.ViewModels.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+}
+
+<div style="display:flex; justify-content:center; padding-top:2rem;">
+    <div class="form-box" style="width:100%;">
+
+        <div class="page-header" style="margin-bottom:1.5rem;">
+            <h1 style="font-size:1.25rem;">Request Account</h1>
+            <p>Your request will be reviewed by the admin before activation</p>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+
+        <form asp-action="Register" method="post">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-error"
+                 style="display:@(ViewContext.ModelState.IsValid ? "none" : "block")">
+            </div>
+
+            <!-- Name -->
+            <div class="form-group">
+                <label class="form-label" asp-for="Name">Full Name</label>
+                <input class="form-control" asp-for="Name" placeholder="Your full name" />
+                <span class="form-error" asp-validation-for="Name"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label class="form-label" asp-for="Email">Email Address</label>
+                <input class="form-control" asp-for="Email" placeholder="you@university.ac.lk" />
+                <span class="form-error" asp-validation-for="Email"></span>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label class="form-label" asp-for="Password">Password</label>
+                <input class="form-control" asp-for="Password" type="password" placeholder="Min. 6 characters" />
+                <span class="form-error" asp-validation-for="Password"></span>
+            </div>
+
+            <!-- Role -->
+            <div class="form-group">
+                <label class="form-label" asp-for="Role">Role</label>
+                <select class="form-control" asp-for="Role" id="roleSelect">
+                    <option value="">— Select your role —</option>
+                    <option value="Student">Student</option>
+                    <option value="Supervisor">Supervisor</option>
+                </select>
+                <span class="form-error" asp-validation-for="Role"></span>
+            </div>
+
+            <!-- STUDENT FIELDS -->
+            <div id="studentFields" style="display:none;">
+
+                <div class="form-group">
+                    <label class="form-label" asp-for="Batch">Batch</label>
+                    <input class="form-control" asp-for="Batch" placeholder="e.g. 24.1" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" asp-for="RegistrationNumber">Registration Number</label>
+                    <input class="form-control" asp-for="RegistrationNumber" placeholder="e.g. SE241001" />
+                </div>
+
+            </div>
+
+            <!-- SUPERVISOR FIELDS -->
+            <div id="supervisorFields" style="display:none;">
+
+                <div class="form-group">
+                    <label class="form-label" asp-for="Department">Department</label>
+                    <input class="form-control" asp-for="Department" placeholder="e.g. Computing" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" asp-for="ResearchAreaId">Research Area</label>
+                    <select class="form-control" asp-for="ResearchAreaId">
+                        <option value="">— Select research area —</option>
+                        @foreach (var area in Model.ResearchAreas)
+                        {
+                            <option value="@area.Id">@area.Name</option>
+                        }
+                    </select>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:10px;">
+                Submit Request
+            </button>
+
+        </form>
+
+        <p style="font-size:13px; color:var(--grey-600); margin-top:1.25rem; text-align:center;">
+            Already registered? 
+            <a href="/Account/Login" style="color:var(--black); font-weight:500;">Sign in</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    const roleSelect = document.getElementById('roleSelect');
+    const studentFields = document.getElementById('studentFields');
+    const supervisorFields = document.getElementById('supervisorFields');
+
+    function toggleFields() {
+        const role = roleSelect.value;
+
+        studentFields.style.display = role === "Student" ? "block" : "none";
+        supervisorFields.style.display = role === "Supervisor" ? "block" : "none";
+    }
+
+    roleSelect.addEventListener("change", toggleFields);
+
+    // run once on load
+    toggleFields();
+</script>

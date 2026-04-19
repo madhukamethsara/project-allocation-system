@@ -1,0 +1,29 @@
+@model LoginViewModel
+@{ ViewBag.Title = "Sign In"; }
+
+<div style="display:flex; justify-content:center; padding-top:2rem;">
+    <div class="form-box" style="width:100%;">
+        <div class="page-header" style="margin-bottom:1.5rem;">
+            <h1 style="font-size:1.25rem;">Sign In</h1>
+            <p>Access your BlindMatch dashboard</p>
+        </div>
+
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-error" style="display:@(ViewContext.ModelState.IsValid ? "none" : "block")"></div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Email">Email Address</label>
+                <input class="form-control" asp-for="Email" placeholder="you@university.ac.lk" autocomplete="email" />
+                <span class="form-error" asp-validation-for="Email"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Password">Password</label>
+                <input class="form-control" asp-for="Password" type="password" placeholder="••••••••" autocomplete="current-password" />
+                <span class="form-error" asp-validation-for="Password"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:10px;">Sign In</button>
+        </form>
+    </div>
+</div>
