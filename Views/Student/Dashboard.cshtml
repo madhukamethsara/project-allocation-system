@@ -1,0 +1,146 @@
+@model List<BlindMatchPAS.Models.Project>
+
+@{
+    ViewBag.Title = "My Projects";
+}
+
+<div class="page-header">
+    <h1>My Projects</h1>
+    <p>Track your submitted projects and supervisor feedback.</p>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">📂</div>
+        <h3>No projects yet</h3>
+        <p>Start by submitting your first project.</p>
+
+        <a href="/Student/Submit" class="btn btn-primary">Submit Project</a>
+    </div>
+}
+else
+{
+    <div class="card-grid">
+        @foreach (var p in Model)
+        {
+            <div class="card">
+
+                <!-- Meta -->
+                <div class="card-meta">
+                    @(p.ResearchArea?.Name ?? "Unknown")
+                    &nbsp;·&nbsp;
+                    @p.CreatedAt.ToString("dd MMM yyyy")
+                </div>
+
+                <!-- Title -->
+                <div class="card-title">@p.Title</div>
+
+                <!-- Status -->
+                <div style="margin-bottom:10px; display:flex; gap:6px; flex-wrap:wrap;">
+                    <span class="badge badge-pending">@p.Status</span>
+
+                    @if (p.NeedsRevision)
+                    {
+                        <span class="badge" style="background:#fff7ed; color:#9a3412;">
+                            Needs Revision
+                        </span>
+                    }
+
+                    @if (p.Feedbacks != null && p.Feedbacks.Any())
+                    {
+                        <span class="badge" style="background:#eef2ff; color:#3730a3;">
+                            @p.Feedbacks.Count Feedback
+                        </span>
+                    }
+                </div>
+
+                <!-- Revision Alert -->
+                @if (p.NeedsRevision)
+                {
+                    <div style="background:#fff7ed; border:1px solid #fdba74; padding:8px; margin-bottom:10px; font-size:13px;">
+                        ⚠ Your supervisor requested changes. Please review feedback.
+                    </div>
+                }
+
+                <!-- Description -->
+                <div class="card-body" style="margin-bottom:10px;">
+                    @p.Description.Substring(0, Math.Min(p.Description.Length, 140))
+                    @(p.Description.Length > 140 ? "…" : "")
+                </div>
+
+                <!-- Tech stack -->
+                <div style="margin-bottom:10px;">
+                    <span style="font-size:11px; color:var(--grey-400); font-family:monospace;">
+                        STACK:
+                    </span>
+                    <span style="font-size:13px; color:var(--grey-600);">
+                        @p.TechStack
+                    </span>
+                </div>
+
+                <!-- Latest Feedback Preview -->
+                @if (p.Feedbacks != null && p.Feedbacks.Any())
+                {
+                    var latest = p.Feedbacks
+                        .OrderByDescending(f => f.CreatedAt)
+                        .First();
+
+                    <div style="margin-bottom:10px; padding:8px; background:#f9fafb; border:1px solid #e5e7eb;">
+                        <strong style="font-size:13px;">Latest Feedback:</strong>
+                        <p style="font-size:13px; color:#555; margin:5px 0;">
+                            @latest.Comment.Substring(0, Math.Min(latest.Comment.Length, 120))
+                            @(latest.Comment.Length > 120 ? "…" : "")
+                        </p>
+                    </div>
+                }
+
+                <!-- Supervisor Info -->
+                @if (p.Status == BlindMatchPAS.Models.ProjectStatus.Matched && p.Supervisor != null)
+                {
+                    <div style="margin-bottom:10px; padding:8px; background:#ecfdf5; border:1px solid #86efac;">
+                        <strong>Supervisor:</strong> @p.Supervisor.Name <br />
+                        <small>@p.Supervisor.Email</small>
+                    </div>
+                }
+
+                <!-- Actions -->
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+
+                    <!-- View Details -->
+                    <a href="/Student/ProjectDetails/@p.Id" class="btn btn-sm">
+                        View Details
+                    </a>
+
+                    <!-- Edit (only if not matched) -->
+                    @if (p.Status != BlindMatchPAS.Models.ProjectStatus.Matched)
+                    {
+                        <a href="/Student/Edit/@p.Id" class="btn btn-sm">
+                            Edit
+                        </a>
+                    }
+
+                    <!-- Withdraw -->
+                    @if (p.Status != BlindMatchPAS.Models.ProjectStatus.Matched)
+                    {
+                        <form method="post" action="/Student/Withdraw/@p.Id"
+                              onsubmit="return confirm('Are you sure you want to withdraw this project?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm" style="background:#fee2e2; color:#991b1b;">
+                                Withdraw
+                            </button>
+                        </form>
+                    }
+                </div>
+
+            </div>
+        }
+    </div>
+}
+
+<!-- Submit button -->
+<div style="margin-top:30px;">
+    <a href="/Student/Submit" class="btn btn-primary">
+        + Submit New Project
+    </a>
+</div>
