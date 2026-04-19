@@ -1,0 +1,54 @@
+<@&1265325314532315217>el List<BlindMatchPAS.Models.ViewModels.MatchOverviewViewModel>
+@{ ViewBag.Title = "All Matches"; }
+
+<div class="page-header">
+    <h1>Confirmed Matches</h1>
+    <p>All confirmed supervisor–student project pairings</p>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">◻</div>
+        <h3>No matches yet</h3>
+        <p>Matches will appear here once supervisors confirm projects.</p>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Research Area</th>
+                    <th>Student</th>
+                    <th>Supervisor</th>
+                    <th>Matched On</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model)
+                {
+                    <tr>
+                        <td style="font-weight:500;">@m.ProjectTitle</td>
+                        <td>
+                            <span class="badge badge-pending" style="font-size:10px;">@m.ResearchArea</span>
+                        </td>
+                        <td>
+                            <div style="font-weight:500;">@m.StudentName</div>
+                            <div style="font-size:12px; color:var(--grey-400);">@m.StudentEmail</div>
+                        </td>
+                        <td>
+                            <div style="font-weight:500;">@m.SupervisorName</div>
+                            <div style="font-size:12px; color:var(--grey-400);">@m.SupervisorEmail</div>
+                        </td>
+                        <td style="font-size:12px; color:var(--grey-400); font-family:var(--font-mono);">
+                            @(m.MatchedAt?.ToString("dd MMM yyyy HH:mm") ?? "—")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}s
