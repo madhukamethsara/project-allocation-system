@@ -10,9 +10,11 @@ obj/
 .DS_Store
 Thumbs.db
 
+
 # Ignore root project files too, if you want only structure
 Program.cs
 *.csproj
 *.json
 README.md
 git-commits.sh
+
