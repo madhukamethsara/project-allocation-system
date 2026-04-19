@@ -1,0 +1,271 @@
+@model List<BlindMatchPAS.Models.ViewModels.BlindProjectViewModel>
+
+@{
+    ViewBag.Title = "Browse Projects";
+
+    var available = Model.Where(p => !p.IsMatched).ToList();
+    var matched = Model.Where(p => p.IsMatched).ToList();
+
+    var pinnedProjects = ViewBag.PinnedProjects as List<BlindMatchPAS.Models.Project>
+                        ?? new List<BlindMatchPAS.Models.Project>();
+}
+
+<div class="page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div>
+        <h1 style="margin:0;">Browse Projects</h1>
+        <p style="margin:0; font-size:13px; color:var(--grey-600);">
+            Student identities are hidden. Confirm a match to reveal identities.
+        </p>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span style="font-size:13px; color:var(--grey-500);">
+            👤 @Context.Session.GetString("UserName")
+        </span>
+
+        <a href="/Supervisor/Profile"
+           class="btn btn-sm"
+           style="background:#fff; border:1px solid #cbd5e1; color:#334155; display:flex; align-items:center; gap:4px;">
+            ⚙ Profile
+        </a>
+    </div>
+</div>
+
+<div style="display:flex; gap:1rem; margin-bottom:1.5rem; align-items:center; flex-wrap:wrap;">
+    <span class="badge badge-blind">Blind Review Active</span>
+    <span style="font-size:13px; color:var(--grey-600);">
+        @available.Count available &nbsp;·&nbsp; @matched.Count matched by you &nbsp;·&nbsp; @pinnedProjects.Count pinned
+    </span>
+</div>
+
+@if (!available.Any() && !matched.Any() && !pinnedProjects.Any())
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">◻</div>
+        <h3>No projects available</h3>
+        <p>Check back later when students submit their proposals.</p>
+    </div>
+}
+
+@if (pinnedProjects.Any())
+{
+    <div class="section-label">Pinned Projects (@pinnedProjects.Count)</div>
+    <div class="card-grid" style="margin-bottom:2.5rem;">
+        @foreach (var p in pinnedProjects)
+        {
+            <div class="card" style="border-color:#fbbf24; background:#fffef7;">
+                <div class="card-meta">
+                    @(p.ResearchArea?.Name ?? "Unknown") &nbsp;·&nbsp; @p.CreatedAt.ToString("dd MMM yyyy")
+                </div>
+
+                <div class="card-title">@p.Title</div>
+
+                <div style="margin-bottom:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <span class="badge badge-pending">@p.Status</span>
+
+                    @if (p.NeedsRevision)
+                    {
+                        <span class="badge" style="background:#fef3c7; color:#92400e;">Needs Revision</span>
+                    }
+
+                    <span class="badge" style="background:#fef3c7; color:#92400e;">Pinned</span>
+                </div>
+
+                <div class="card-body" style="margin-bottom:0.75rem;">
+                    @p.Description.Substring(0, Math.Min(p.Description.Length, 140))@(p.Description.Length > 140 ? "…" : "")
+                </div>
+
+                <div style="margin-bottom:0.5rem;">
+                    <span style="font-family:var(--font-mono); font-size:11px; color:var(--grey-400);">STACK:</span>
+                    <span style="font-size:13px; color:var(--grey-600);">@p.TechStack</span>
+                </div>
+
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:1rem;">
+                    <form method="post" action="/Supervisor/UnpinProject/@p.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm" style="background:#fff; border:1px solid #fbbf24; color:#92400e;">
+                            Unpin
+                        </button>
+                    </form>
+
+                    <form method="post" action="/Supervisor/MarkRevisionNeeded/@p.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm" style="background:#fff7ed; border:1px solid #fdba74; color:#9a3412;">
+                            Mark Revision
+                        </button>
+                    </form>
+
+                    <form method="post" action="/Supervisor/ClearRevisionNeeded/@p.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm" style="background:#ecfdf5; border:1px solid #86efac; color:#166534;">
+                            Clear Revision
+                        </button>
+                    </form>
+                </div>
+
+                <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #e5e7eb;">
+                    <form method="post" action="/Supervisor/AddFeedback">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="projectId" value="@p.Id" />
+
+                        <label style="display:block; font-size:13px; font-weight:600; margin-bottom:0.4rem;">
+                            Supervisor Feedback
+                        </label>
+
+                        <textarea name="comment"
+                                  rows="3"
+                                  placeholder="Write feedback for the student..."
+                                  style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:8px; resize:vertical; font-size:13px; margin-bottom:0.75rem;"></textarea>
+
+                        <button type="submit" class="btn btn-primary btn-sm">Submit Feedback</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (available.Any())
+{
+    <div class="section-label">Available for Review (@available.Count)</div>
+    <div class="card-grid" style="margin-bottom:2.5rem;">
+        @foreach (var p in available)
+        {
+            <div class="card">
+                <div class="card-meta">
+                    @p.ResearchAreaName &nbsp;·&nbsp; @p.CreatedAt.ToString("dd MMM yyyy")
+                </div>
+
+                <div class="card-title">@p.Title</div>
+
+                <div style="margin-bottom:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <span class="badge badge-pending">@p.Status</span>
+                </div>
+
+                <div class="card-body" style="margin-bottom:0.75rem;">
+                    @p.Description.Substring(0, Math.Min(p.Description.Length, 150))@(p.Description.Length > 150 ? "…" : "")
+                </div>
+
+                <div style="margin-bottom:0.5rem;">
+                    <span style="font-family:var(--font-mono); font-size:11px; color:var(--grey-400);">STACK:</span>
+                    <span style="font-size:13px; color:var(--grey-600);">@p.TechStack</span>
+                </div>
+
+                <div style="margin-bottom:1rem; padding:0.6rem 0.75rem; background:var(--grey-100); border:var(--border);">
+                    <span class="blind-mask">◼◼◼ Student identity hidden until match ◼◼◼</span>
+                </div>
+
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <form method="post" action="/Supervisor/Match/@p.Id" onsubmit="return confirm('Confirm match? This will reveal student identity.')">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-success btn-sm">Confirm Match</button>
+                    </form>
+
+                    <form method="post" action="/Supervisor/PinProject/@p.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm" style="background:#fff; border:1px solid #cbd5e1; color:#334155;">
+                            Pin
+                        </button>
+                    </form>
+
+                    <form method="post" action="/Supervisor/MarkRevisionNeeded/@p.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm" style="background:#fff7ed; border:1px solid #fdba74; color:#9a3412;">
+                            Mark Revision
+                        </button>
+                    </form>
+                </div>
+
+                <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #e5e7eb;">
+                    <form method="post" action="/Supervisor/AddFeedback">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="projectId" value="@p.Id" />
+
+                        <label style="display:block; font-size:13px; font-weight:600; margin-bottom:0.4rem;">
+                            Quick Feedback
+                        </label>
+
+                        <textarea name="comment"
+                                  rows="3"
+                                  placeholder="Write feedback for this project..."
+                                  style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:8px; resize:vertical; font-size:13px; margin-bottom:0.75rem;"></textarea>
+
+                        <button type="submit" class="btn btn-primary btn-sm">Submit Feedback</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (matched.Any())
+{
+    <div class="section-label">Your Matched Projects (@matched.Count)</div>
+    <div class="card-grid">
+        @foreach (var p in matched)
+        {
+            <div class="card" style="border-color:#86efac;">
+                <div class="card-meta">
+                    @p.ResearchAreaName &nbsp;·&nbsp; @p.CreatedAt.ToString("dd MMM yyyy")
+                </div>
+
+                <div class="card-title">@p.Title</div>
+
+                <div style="margin-bottom:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <span class="badge badge-matched">Matched</span>
+                </div>
+
+                <div class="card-body" style="margin-bottom:0.75rem;">
+                    @p.Description.Substring(0, Math.Min(p.Description.Length, 120))@(p.Description.Length > 120 ? "…" : "")
+                </div>
+
+                <div class="reveal-panel" style="margin-bottom:1rem;">
+                    <div class="reveal-panel-title">✓ Identity Revealed</div>
+                    <p><strong>@p.RevealedStudentName</strong></p>
+                    <p>@p.RevealedStudentEmail</p>
+                </div>
+
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <form method="post" action="/Supervisor/PinProject/@p.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm" style="background:#fff; border:1px solid #cbd5e1; color:#334155;">
+                            Pin
+                        </button>
+                    </form>
+
+                    <form method="post" action="/Supervisor/MarkRevisionNeeded/@p.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm" style="background:#fff7ed; border:1px solid #fdba74; color:#9a3412;">
+                            Mark Revision
+                        </button>
+                    </form>
+
+                    <form method="post" action="/Supervisor/ClearRevisionNeeded/@p.Id">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm" style="background:#ecfdf5; border:1px solid #86efac; color:#166534;">
+                            Clear Revision
+                        </button>
+                    </form>
+                </div>
+
+                <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #e5e7eb;">
+                    <form method="post" action="/Supervisor/AddFeedback">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="projectId" value="@p.Id" />
+
+                        <label style="display:block; font-size:13px; font-weight:600; margin-bottom:0.4rem;">
+                            Supervisor Feedback
+                        </label>
+
+                        <textarea name="comment"
+                                  rows="3"
+                                  placeholder="Write feedback for the matched student..."
+                                  style="width:100%; padding:0.75rem; border:1px solid #d1d5db; border-radius:8px; resize:vertical; font-size:13px; margin-bottom:0.75rem;"></textarea>
+
+                        <button type="submit" class="btn btn-primary btn-sm">Submit Feedback</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+}

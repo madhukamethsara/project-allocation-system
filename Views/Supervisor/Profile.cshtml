@@ -1,0 +1,72 @@
+@model BlindMatchPAS.Models.ViewModels.SupervisorProfileViewModel
+
+@{
+    ViewBag.Title = "Supervisor Profile";
+}
+
+<div class="page-header">
+    <h1>My Profile</h1>
+    <p>Update your personal details and research specialization.</p>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div style="background:#ecfdf5; border:1px solid #86efac; padding:10px; margin-bottom:20px;">
+        @TempData["Success"]
+    </div>
+}
+
+<div class="card" style="max-width:600px; margin:auto;">
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- Name -->
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:600;">Full Name</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" style="color:red;"></span>
+        </div>
+
+        <!-- Email -->
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:600;">Email</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" style="color:red;"></span>
+        </div>
+
+        <!-- Department -->
+        <div style="margin-bottom:15px;">
+            <label style="font-weight:600;">Department</label>
+            <input asp-for="Department" class="form-control" placeholder="e.g. Software Engineering" />
+        </div>
+
+        <!-- Research Area -->
+        <div style="margin-bottom:20px;">
+            <label style="font-weight:600;">Research Area</label>
+
+            <select asp-for="ResearchAreaId" class="form-control">
+                <option value="">-- Select Research Area --</option>
+                @foreach (var area in Model.ResearchAreas)
+                {
+                    <option value="@area.Id">@area.Name</option>
+                }
+            </select>
+
+            <span asp-validation-for="ResearchAreaId" style="color:red;"></span>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+
+            <a href="/Supervisor/Dashboard" class="btn btn-sm">
+                Back
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                Update Profile
+            </button>
+
+        </div>
+    </form>
+</div>
