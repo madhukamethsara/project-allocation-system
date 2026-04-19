@@ -1,0 +1,148 @@
+@model BlindMatchPAS.Models.ViewModels.StudentProfileEditViewModel
+@{
+    ViewBag.Title = "My Profile";
+}
+
+<div class="page-header">
+    <h1>My Profile</h1>
+    <p>Manage your personal and academic details</p>
+</div>
+
+@if (TempData["Success"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+else if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-error">@errorMessage</div>
+}
+
+<div class="profile-container">
+
+    <!-- LEFT SIDE: SUMMARY -->
+    <div class="profile-summary">
+        <div class="profile-avatar">
+            @Model.Name.Substring(0,1).ToUpper()
+        </div>
+
+        <h3>@Model.Name</h3>
+        <p>@Model.Email</p>
+
+        <div class="profile-meta">
+            <div><strong>Batch:</strong> @Model.Batch</div>
+            <div><strong>Reg No:</strong> @Model.RegistrationNumber</div>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE: EDIT FORM -->
+    <div class="profile-form">
+        <form asp-action="Profile" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-error"
+                 style="display:@(ViewContext.ModelState.IsValid ? "none" : "block")">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Name">Full Name</label>
+                <input class="form-control" asp-for="Name" />
+                <span class="form-error" asp-validation-for="Name"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Email">Email</label>
+                <input class="form-control" asp-for="Email" />
+                <span class="form-error" asp-validation-for="Email"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Batch">Batch</label>
+                <input class="form-control" asp-for="Batch" />
+                <span class="form-error" asp-validation-for="Batch"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="RegistrationNumber">Registration Number</label>
+                <input class="form-control" asp-for="RegistrationNumber" />
+                <span class="form-error" asp-validation-for="RegistrationNumber"></span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/Student/Dashboard" class="btn">Back</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    setTimeout(() => {
+        const alertBox = document.querySelector('.alert');
+        if (alertBox) {
+            alertBox.style.display = 'none';
+        }
+    }, 3000);
+</script>
+
+<style>
+.profile-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.profile-summary {
+    border: 1px solid #111;
+    padding: 1.5rem;
+    text-align: center;
+    background: #fff;
+}
+
+.profile-avatar {
+    width: 70px;
+    height: 70px;
+    border: 1px solid #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 auto 1rem;
+}
+
+.profile-summary h3 {
+    margin-bottom: 0.3rem;
+}
+
+.profile-summary p {
+    font-size: 13px;
+    color: var(--grey-500);
+}
+
+.profile-meta {
+    margin-top: 1rem;
+    font-size: 13px;
+    color: var(--grey-600);
+}
+
+.profile-meta div {
+    margin-bottom: 0.4rem;
+}
+
+.profile-form {
+    border: 1px solid #111;
+    padding: 1.5rem;
+    background: #fff;
+}
+
+.form-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+}
+</style>

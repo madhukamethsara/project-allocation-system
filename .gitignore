@@ -10,25 +10,9 @@ obj/
 .DS_Store
 Thumbs.db
 
-# Ignore actual source files
-Controllers/*.cs
-Models/*.cs
-Services/*.cs
-Data/*.cs
-Migrations/**
-Views/**
-
 # Ignore root project files too, if you want only structure
 Program.cs
 *.csproj
 *.json
 README.md
 git-commits.sh
-
-# Keep only folder markers
-!Controllers/.gitkeep
-!Models/.gitkeep
-!Services/.gitkeep
-!Views/.gitkeep
-!Data/.gitkeep
-!.gitignore

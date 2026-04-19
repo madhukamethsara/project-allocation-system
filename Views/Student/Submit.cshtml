@@ -1,0 +1,44 @@
+@model ProjectSubmitViewModel
+@{ ViewBag.Title = "Submit Project"; }
+
+<div class="page-header">
+    <h1>Submit Project Proposal</h1>
+    <p>Your identity will remain hidden from supervisors until a match is confirmed</p>
+</div>
+
+<div style="max-width:640px;">
+    <form asp-action="Submit" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="Title">Project Title</label>
+            <input class="form-control" asp-for="Title" placeholder="e.g. AI-Based Exam Scheduling System" />
+            <span class="form-error" asp-validation-for="Title"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="ResearchAreaId">Research Area</label>
+            <select class="form-control" asp-for="ResearchAreaId" asp-items="@(new SelectList(Model.ResearchAreas, "Id", "Name"))">
+                <option value="">— Select an area —</option>
+            </select>
+            <span class="form-error" asp-validation-for="ResearchAreaId"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="TechStack">Technology Stack</label>
+            <input class="form-control" asp-for="TechStack" placeholder="e.g. ASP.NET Core, SQL Server, React" />
+            <span class="form-error" asp-validation-for="TechStack"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" asp-for="Description">Abstract / Description</label>
+            <textarea class="form-control" asp-for="Description" rows="6" placeholder="Describe your project idea, objectives, and expected outcomes…"></textarea>
+            <span class="form-error" asp-validation-for="Description"></span>
+        </div>
+
+        <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+            <button type="submit" class="btn btn-primary">Submit Proposal</button>
+            <a href="/Student/Dashboard" class="btn">Cancel</a>
+        </div>
+    </form>
+</div>
