@@ -1,0 +1,28 @@
+@{
+    ViewBag.Title = "Admin Dashboard";
+}
+
+<div class="page-header">
+    <h1>Admin Overview</h1>
+    <p>System-wide allocation and management dashboard</p>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-number">@ViewBag.TotalProjects</div>
+        <div class="stat-label">Total Projects</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">@ViewBag.TotalMatches</div>
+        <div class="stat-label">Confirmed Matches</div>
+    </div>
+</div>
+
+<div class="section-label">Quick Actions</div>
+<div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+    <a href="/Admin/AllProjects" class="btn">View All Projects</a>
+    <a href="/Admin/AllMatches" class="btn">View All Matches</a>
+    <a href="/Admin/ResearchAreas" class="btn">Manage Research Areas</a>
+    <a href="/Admin/UserManagement" class="btn">Manage Users & Permissions</a>
+    <a href="/Admin/PendingRegistrations" class="btn">Pending Requests</a>
+</div>

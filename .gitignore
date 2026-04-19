@@ -11,6 +11,7 @@ obj/
 Thumbs.db
 
 
+
 # Ignore root project files too, if you want only structure
 Program.cs
 *.csproj
