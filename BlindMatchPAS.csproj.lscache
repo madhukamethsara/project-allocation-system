@@ -92,6 +92,7 @@ Services/
  AuthService.cs
  IAuthService.cs
  IProjectService.cs
+ lProjectService.cs
  ProjectService.cs
  ResearchAreaService.cs
 
@@ -451,6 +452,7 @@ Views/Admin/
  AllProjects.cshtml
  Dashboard.cshtml
  PendingRegistrations.cshtml
+ ResearchArea.cshtml
  ResearchAreas.cshtml
  UserManagement.cshtml
 Views/
@@ -479,6 +481,7 @@ Views/Admin/
  AllProjects.cshtml
  Dashboard.cshtml
  PendingRegistrations.cshtml
+ ResearchArea.cshtml
  ResearchAreas.cshtml
  UserManagement.cshtml
 Views/
