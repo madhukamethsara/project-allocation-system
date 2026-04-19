@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewBag.Title ?? "BlindMatch PAS")</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #0a0a0a;
+            --white: #ffffff;
+            --grey-100: #f4f4f4;
+            --grey-200: #e8e8e8;
+            --grey-400: #a0a0a0;
+            --grey-600: #555555;
+            --accent: #0a0a0a;
+            --radius: 2px;
+            --border: 1px solid var(--grey-200);
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'DM Mono', monospace;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--white);
+            color: var(--black);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* NAV */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            height: 60px;
+            border-bottom: var(--border);
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--black);
+            text-decoration: none;
+        }
+
+        .nav-brand span {
+            display: inline-block;
+            background: var(--black);
+            color: var(--white);
+            padding: 2px 6px;
+            margin-right: 6px;
+            font-size: 11px;
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+
+        .nav-links a {
+            font-size: 13px;
+            color: var(--grey-600);
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            transition: color 0.15s;
+        }
+        .nav-links a:hover { color: var(--black); }
+
+        .nav-role {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: var(--border);
+            padding: 3px 8px;
+            color: var(--grey-600);
+        }
+
+        .btn-logout {
+            font-size: 13px;
+            color: var(--grey-600);
+            text-decoration: none;
+            border: var(--border);
+            padding: 4px 12px;
+            transition: all 0.15s;
+        }
+        .btn-logout:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+
+        /* MAIN */
+        main { flex: 1; padding: 2.5rem 2rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+        /* PAGE HEADER */
+        .page-header { margin-bottom: 2rem; border-bottom: var(--border); padding-bottom: 1.5rem; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
+        .page-header p { color: var(--grey-600); font-size: 14px; margin-top: 4px; }
+
+        /* CARDS */
+        .card {
+            border: var(--border);
+            padding: 1.5rem;
+            background: var(--white);
+            transition: border-color 0.15s;
+        }
+        .card:hover { border-color: var(--grey-400); }
+
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+
+        .card-title { font-size: 15px; font-weight: 600; margin-bottom: 0.4rem; }
+        .card-meta {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--grey-400);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+        .card-body { font-size: 14px; color: var(--grey-600); line-height: 1.7; }
+        .card-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+
+        /* STATUS BADGES */
+        .badge {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border: 1px solid currentColor;
+            font-weight: 500;
+        }
+        .badge-pending { color: var(--grey-600); }
+        .badge-review { color: #b45309; }
+        .badge-matched { color: #166534; background: #f0fdf4; border-color: #166534; }
+        .badge-withdrawn { color: var(--grey-400); }
+        .badge-blind { color: #6d28d9; background: #faf5ff; border-color: #6d28d9; }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-block;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 7px 16px;
+            cursor: pointer;
+            text-decoration: none;
+            border: var(--border);
+            background: var(--white);
+            color: var(--black);
+            transition: all 0.15s;
+            letter-spacing: 0.01em;
+        }
+        .btn:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+
+        .btn-primary { background: var(--black); color: var(--white); border-color: var(--black); }
+        .btn-primary:hover { background: var(--grey-600); border-color: var(--grey-600); }
+
+        .btn-danger { color: #b91c1c; border-color: #fca5a5; }
+        .btn-danger:hover { background: #b91c1c; color: var(--white); border-color: #b91c1c; }
+
+        .btn-success { color: #166534; border-color: #86efac; }
+        .btn-success:hover { background: #166534; color: var(--white); border-color: #166534; }
+
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+        /* FORMS */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--grey-600);
+            margin-bottom: 6px;
+            font-family: var(--font-mono);
+        }
+        .form-control {
+            width: 100%;
+            border: var(--border);
+            padding: 9px 12px;
+            font-size: 14px;
+            font-family: var(--font-body);
+            background: var(--white);
+            color: var(--black);
+            outline: none;
+            transition: border-color 0.15s;
+            border-radius: var(--radius);
+        }
+        .form-control:focus { border-color: var(--black); }
+        .form-control.error { border-color: #b91c1c; }
+
+        .form-error { font-size: 12px; color: #b91c1c; margin-top: 4px; }
+        .form-box { max-width: 480px; border: var(--border); padding: 2rem; }
+
+        /* ALERTS */
+        .alert {
+            padding: 12px 16px;
+            font-size: 13px;
+            margin-bottom: 1.5rem;
+            border: var(--border);
+        }
+        .alert-success { border-color: #86efac; background: #f0fdf4; color: #166534; }
+        .alert-error { border-color: #fca5a5; background: #fef2f2; color: #b91c1c; }
+
+        /* TABLE */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--grey-600);
+            border-bottom: 2px solid var(--grey-200);
+            padding: 8px 12px;
+            text-align: left;
+        }
+        td { padding: 10px 12px; border-bottom: var(--border); vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--grey-100); }
+
+        /* STAT CARDS */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { border: var(--border); padding: 1.25rem; }
+        .stat-number { font-size: 2rem; font-weight: 600; letter-spacing: -0.04em; line-height: 1; }
+        .stat-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--grey-400); margin-top: 4px; }
+
+        /* REVEAL PANEL */
+        .reveal-panel { border: 1px solid #166534; background: #f0fdf4; padding: 1rem 1.25rem; margin-top: 1rem; }
+        .reveal-panel-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #166534; margin-bottom: 6px; }
+        .reveal-panel p { font-size: 14px; color: #166534; }
+
+        /* BLIND MASK */
+        .blind-mask { font-family: var(--font-mono); font-size: 13px; color: var(--grey-400); letter-spacing: 0.04em; font-style: italic; }
+
+        /* FOOTER */
+        footer {
+            border-top: var(--border);
+            padding: 1rem 2rem;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--grey-400);
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--grey-400); }
+        .empty-state-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .empty-state h3 { font-size: 15px; font-weight: 500; color: var(--grey-600); margin-bottom: 0.5rem; }
+        .empty-state p { font-size: 13px; }
+
+        /* SECTION DIVIDER */
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--grey-400);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: var(--grey-200); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="/"><span>PAS</span> BlindMatch</a>
+    <div class="nav-links">
+        @{
+            var role = Context.Session.GetString("UserRole");
+            var name = Context.Session.GetString("UserName");
+        }
+        @if (!string.IsNullOrEmpty(role))
+        {
+            <span class="nav-role">@role</span>
+            <span style="font-size:13px; color:var(--grey-600);">@name</span>
+
+            @if (role == "Student")
+            {
+                <a href="/Student/Dashboard">Dashboard</a>
+                <a href="/Student/Submit">New Project</a>
+            }
+            else if (role == "Supervisor")
+            {
+                <a href="/Supervisor/Dashboard">Browse Projects</a>
+            }
+            else if (role == "Admin")
+            {
+                <a href="/Admin/Dashboard">Overview</a>
+                <a href="/Admin/AllProjects">Projects</a>
+                <a href="/Admin/AllMatches">Matches</a>
+                <a href="/Admin/ResearchAreas">Areas</a>
+            }
+            <a href="/Account/Logout" class="btn-logout">Sign out</a>
+        }
+        else
+        {
+            <a href="/Account/Login">Sign in</a>
+        }
+    </div>
+</nav>
+
+<main>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-error">@TempData["Error"]</div>
+    }
+
+    @RenderBody()
+</main>
+
+<footer>
+    BlindMatch PAS &mdash; PUSL2020 &mdash; @DateTime.Now.Year
+</footer>
+
+</body>
+</html>
