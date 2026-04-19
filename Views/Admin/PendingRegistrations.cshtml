@@ -1,0 +1,132 @@
+@model List<BlindMatchPAS.Models.RegistrationRequest>
+@{
+    ViewBag.Title = "Pending Registrations";
+}
+
+<div class="page-header">
+    <h1>Pending Registration Requests</h1>
+    <p>Review, approve, or reject new account requests.</p>
+</div>
+
+@if (TempData["Success"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+else if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-error">@errorMessage</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">◻</div>
+        <h3>No pending requests</h3>
+        <p>New registration requests will appear here for admin review.</p>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Batch</th>
+                    <th>Registration No</th>
+                    <th>Department</th>
+                    <th>Research Area</th>
+                    <th>Requested On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td style="font-weight:500;">@r.Name</td>
+                        <td style="font-size:12px; color:var(--grey-400);">@r.Email</td>
+                        <td>
+                            <span class="badge badge-pending" style="font-size:10px;">@r.Role</span>
+                        </td>
+                        <td>@(string.IsNullOrWhiteSpace(r.Batch) ? "—" : r.Batch)</td>
+                        <td>@(string.IsNullOrWhiteSpace(r.RegistrationNumber) ? "—" : r.RegistrationNumber)</td>
+                        <td>@(string.IsNullOrWhiteSpace(r.Department) ? "—" : r.Department)</td>
+                        <td>
+                            @if (r.ResearchAreaId.HasValue)
+                            {
+                                @($"Area #{r.ResearchAreaId}")
+                            }
+                            else
+                            {
+                                @:—
+                            }
+                        </td>
+                        <td style="font-size:12px; color:var(--grey-400);">
+                            @r.RequestedAt.ToString("dd MMM yyyy HH:mm")
+                        </td>
+                        <td>
+                            <div class="action-stack">
+                                <form asp-action="ApproveRequest" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <button type="submit" class="mini-btn">Approve</button>
+                                </form>
+
+                                <form asp-action="RejectRequest" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <button type="submit" class="mini-btn btn-outline">Reject</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<script>
+    setTimeout(() => {
+        const alertBox = document.querySelector('.alert');
+        if (alertBox) {
+            alertBox.style.display = 'none';
+        }
+    }, 3000);
+</script>
+
+<style>
+    .action-stack {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .mini-btn {
+        background: #000;
+        color: #fff;
+        border: 1px solid #000;
+        padding: 6px 10px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .mini-btn:hover {
+        background: #fff;
+        color: #000;
+    }
+
+    .btn-outline {
+        background: #fff;
+        color: #000;
+        border: 1px solid #000;
+    }
+
+    .btn-outline:hover {
+        background: #000;
+        color: #fff;
+    }
+</style>
